@@ -1,6 +1,5 @@
 class Character {
-  constructor(d2, props = {}) {
-    this.d2 = d2;
+  constructor(props = {}) {
     this.data = props.data || null;
     this.privacy = props.privacy || 1;
     this.equipment = props.equipment || null;
