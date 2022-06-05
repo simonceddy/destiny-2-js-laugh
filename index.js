@@ -3,8 +3,9 @@ const D2 = require('node-destiny-2');
 const config = require('./config');
 const getPlayerCharacter = require('./src/characters/getPlayerCharacter');
 const playerBuilder = require('./src/players/playerBuilder');
-const { getPlayerData } = require('./src/util/storage');
+const { getAllPlayers } = require('./src/util/storage');
 
+// init Destiny2API
 const app = new D2({
   key: config.appKey,
   oauthConfig: {
@@ -12,8 +13,10 @@ const app = new D2({
   }
 });
 
-const data = getPlayerData('4611686018522414129');
+// Load player data from persistance
+const data = Object.values(getAllPlayers())[0];
 
+// build player object and do some stuff
 playerBuilder(app, data)
   .then((player) => getPlayerCharacter(app, player, player.characterIds[1])
     .then((c) => {
