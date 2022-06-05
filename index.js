@@ -3,6 +3,7 @@ const D2 = require('node-destiny-2');
 const config = require('./config');
 const getPlayerCharacter = require('./src/characters/getPlayerCharacter');
 const playerBuilder = require('./src/players/playerBuilder');
+const { componentTypes } = require('./src/support/consts');
 const { getAllPlayers } = require('./src/util/storage');
 
 // init Destiny2API
@@ -26,7 +27,10 @@ playerBuilder(app, data)
           player.membershipType,
           player.membershipId,
           i.itemInstanceId,
-          [300]
+          [
+            componentTypes.ItemInstances,
+            componentTypes.ItemCommonData,
+          ]
         )
           .then((r) => console.log(r.Response));
       }
