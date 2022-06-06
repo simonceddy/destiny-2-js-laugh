@@ -3,3 +3,5 @@
 /.vscode/
 .DS_Store
 /storage/*.db
+/dist/
+/public/dist/
