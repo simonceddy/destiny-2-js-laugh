@@ -35,7 +35,7 @@ class D2API extends D2 {
       });
       res.on('end', () => {
         console.log('No more data in response.');
-        fs.writeFileSync(zipPath, chunks.join());
+        fs.writeFileSync(zipPath, chunks.join(''));
         // const zip = new SZIP({
         //   file: zipPath,
         //   storeEntries: true

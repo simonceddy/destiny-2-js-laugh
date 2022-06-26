@@ -16,5 +16,6 @@ module.exports = {
     'linebreak-style': 'off',
     'comma-dangle': 'off',
     'import/prefer-default-export': 'off',
+    'no-unused-vars': 'warn'
   },
 };
