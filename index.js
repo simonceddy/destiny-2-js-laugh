@@ -1,38 +1,16 @@
 require('dotenv').config();
-const D2 = require('node-destiny-2');
 const config = require('./config');
-const getPlayerCharacter = require('./src/characters/getPlayerCharacter');
-const playerBuilder = require('./src/players/playerBuilder');
-const { componentTypes } = require('./src/support/consts');
-const { getAllPlayers } = require('./src/util/storage');
+const D2API = require('./src/D2API');
 
-// init Destiny2API
-const app = new D2({
+require('dotenv').config();
+
+const app = new D2API({
   key: config.appKey,
   oauthConfig: {
     id: config.oauth.clientId
   }
 });
 
-// Load player data from persistance
-const data = Object.values(getAllPlayers())[0];
-
-// build player object and do some stuff
-playerBuilder(app, data)
-  .then((player) => getPlayerCharacter(app, player, player.characterIds[1])
-    .then((c) => {
-      if (c) {
-        const i = c.getEquipment().items[0];
-        app.getItem(
-          player.membershipType,
-          player.membershipId,
-          i.itemInstanceId,
-          [
-            componentTypes.ItemInstances,
-            componentTypes.ItemCommonData,
-          ]
-        )
-          .then((r) => console.log(r.Response));
-      }
-    }))
+app.db()
+  .then(console.log)
   .catch(console.error);
