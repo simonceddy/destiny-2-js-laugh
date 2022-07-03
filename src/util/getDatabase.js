@@ -3,12 +3,9 @@ const fs = require('fs');
 const path = require('path');
 const https = require('node:https');
 const { async: Szip } = require('node-stream-zip');
-
-// Points to the storage directory on the filesystem
-const storageDir = path.resolve(__dirname, '../../storage/');
+const { STORAGE_DIR } = require('../support/consts');
 
 // TODO make request async instead of onComplete callback
-// TODO cleanup of zip file after database is extracted
 
 /**
  * Fetch the Destiny 2 database from the current manifest
@@ -35,11 +32,11 @@ async function getDatabase(api, onComplete) {
 
   // The resolved filepath of the zip file that will be downloaded
   // AKA where it will be put on the filesystem
-  const zipPath = path.resolve(storageDir, 'current.zip');
+  const zipPath = path.resolve(STORAGE_DIR, 'current.zip');
 
   // The filepath of the extracted sqlite database on the filesystem
   // This is set on a per request basis since database names will differ
-  const filePath = path.resolve(storageDir, dbPath.split('/').pop());
+  const filePath = path.resolve(STORAGE_DIR, dbPath.split('/').pop());
 
   // This empty array is where the chunks of data will be stored before
   // they are saved as a zip file
@@ -88,11 +85,14 @@ async function getDatabase(api, onComplete) {
       // Now we unzip that zip
       await zip.extract(
         null,
-        storageDir
+        STORAGE_DIR
       );
 
       // And once all that unzipping is done we can close the zip file
       await zip.close();
+
+      // Now the zip is finished with we can delete it
+      fs.unlinkSync(zipPath);
 
       // And this bit allows a function to be run after stuff is all done.
       // The main purpose is to change the wild name of the extracted sqlite
@@ -116,6 +116,7 @@ async function getDatabase(api, onComplete) {
   req.end();
 
   // Finally the filepath is returned for alternative means of renaming
+  // AKA for when I make this properly async
   return filePath;
 }
 

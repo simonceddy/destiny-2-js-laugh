@@ -1,5 +1,5 @@
 async function getPlayerCharacter(d2, player, characterId) {
-  const { membershipId, membershipType } = player.getMembership();
+  const { membershipId, membershipType } = player;
   const res = await d2.getCharacter(
     membershipType,
     membershipId,
