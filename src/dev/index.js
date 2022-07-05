@@ -33,9 +33,13 @@ function makeModel(name = '') {
 
 class ${modelName} extends Model {
   static table = '${name}';
+
+  constructor(hash) {
+    super(hash, ${modelName}.table);
+  }
 }
 
-module.export = ${modelName};
+module.exports = ${modelName};
 `;
 
   fs.writeFileSync(path.resolve(modelsPath, `${modelName}.js`), body);

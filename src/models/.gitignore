@@ -1,3 +1,4 @@
 # Ignoring generated models for now
 *.js
 !Model.js
+!InventoryItem.js

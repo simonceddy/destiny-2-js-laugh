@@ -11,6 +11,9 @@ const D2API = require('./src/D2API');
 const getDatabase = require('./src/util/getDatabase');
 const getPlayerCharacter = require('./src/util/getPlayerCharacter');
 const getPlayersData = require('./src/util/getPlayersData');
+const InventoryItem = require('./src/models/InventoryItem');
+const fetchManifest = require('./src/util/fetchManifest');
+const Manifest = require('./src/Manifest');
 
 // database.serialize(() => {
 //   database.each('SELECT id, json FROM DestinyClassDefinition', (err, row) => {
@@ -27,37 +30,37 @@ const app = new D2API({
   }
 });
 
+console.log(new Manifest());
+// console.log(new InventoryItem(101010));
+
+// fetchManifest(app);
+
 if (fs.existsSync('etc/players.csv')) {
   const players = fs.readFileSync('etc/players.csv').toString().split(',');
   getPlayersData(app, players)
     .then((data) => {
       if (!data) console.log('whoops!');
-      const player = data['Sultan Vinegar#2437'];
-      const firstChar = player.profile.characterIds[1];
+      const player = data['Jenova#2003'];
+      const firstChar = player.profile.characterIds[0];
       if (firstChar) {
         getPlayerCharacter(app, player, firstChar)
-          .then((res) => {
+          .then(async (res) => {
             const { items } = res.equipment && res.equipment.data
               ? res.equipment.data
               : [];
-            if (items[3]) {
-              database.get(
-                `SELECT id, json FROM DestinyInventoryItemDefinition WHERE json LIKE '%"hash":${items[3].itemHash}%'`,
-                (err, row) => {
-                  if (err || !row.json) console.error(err);
-                  console.log(JSON.parse(row.json));
-                }
-              );
-            }
-            // return Promise.all(items.map((i) => {
-            //   console.log(i);
-            //   if (i.itemHash) {
-            //
-            //   }
-            //   return i;
-            // }));
-          });
-        // .then(console.log);
+            const itemObjs = await Promise.all(items.map(async (i) => {
+              console.log(i);
+              if (i.itemHash) {
+                const item = new InventoryItem(i.itemHash);
+                await item.populate();
+                return item;
+              }
+              return null;
+            }));
+
+            return itemObjs;
+          })
+          .then((items) => console.log(items[2].stats()));
       } else {
         console.log('no character found there matey');
       }
