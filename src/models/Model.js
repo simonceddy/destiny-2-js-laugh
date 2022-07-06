@@ -1,19 +1,11 @@
 const EventEmitter = require('events');
-const database = require('../database');
+// const database = require('../database');
+const { asyncGet } = require('../util/asyncQueries');
 
 function fromHash(hash, table) {
   if (table) {
     const sql = `SELECT id, json FROM ${table} WHERE json LIKE '%"hash":${hash}%'`;
-    return new Promise((resolve, reject) => {
-      database
-        .get(sql, (err, row) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(row);
-          }
-        });
-    });
+    return asyncGet(sql);
   }
 
   return Promise.resolve(false);
@@ -42,6 +34,11 @@ class Model extends EventEmitter {
     return false;
   }
 
+  /**
+   * Populate model data from the database
+   * @param {number} hash Hash for the model
+   * @returns {Promise<this>}
+   */
   async populate(hash = null) {
     if (!this.hash && hash) {
       this.hash = hash;
@@ -53,9 +50,15 @@ class Model extends EventEmitter {
       this.id = r.id;
     }
 
-    if (this.handleData) this.handleData(this.data);
+    if (this.handleData) await this.handleData(this.data);
     this.emit('model-populated', this);
     return this;
+  }
+
+  get name() {
+    return this.data && this.data.displayProperties
+      ? this.data.displayProperties.name
+      : null;
   }
 }
 

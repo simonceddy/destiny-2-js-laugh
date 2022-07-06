@@ -27,8 +27,11 @@ function makeModel(name = '') {
       name.length - suffix.length
     );
 
-  console.log(modelName);
-
+  // console.log(modelName);
+  const modelPath = path.resolve(modelsPath, `${modelName}.js`);
+  if (fs.existsSync(modelPath)) {
+    return 0;
+  }
   const body = `const Model = require('./Model');
 
 class ${modelName} extends Model {
@@ -42,7 +45,8 @@ class ${modelName} extends Model {
 module.exports = ${modelName};
 `;
 
-  fs.writeFileSync(path.resolve(modelsPath, `${modelName}.js`), body);
+  fs.writeFileSync(modelPath, body);
+  return 1;
 }
 
 tableList.forEach((n) => {

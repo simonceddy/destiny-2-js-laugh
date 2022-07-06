@@ -21,7 +21,7 @@ async function getPlayersData(api, players = []) {
             Response[0].membershipId,
             [100]
           );
-          console.log(profile);
+          // console.log(profile);
           data[playerName] = {
             ...Response[0],
             profile: profile.Response && profile.Response.profile
